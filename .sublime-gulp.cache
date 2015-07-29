@@ -1,0 +1,1 @@
+{"C:\\Users\\009882133\\outros\\phaser\\gulpfile.js":{"sha1":"7945c7af2c72567e55d0a3d80f98b57ee6702a12","tasks":{"clean":{"name":"clean","dependencies":""},"copy":{"name":"copy","dependencies":"clean"},"scripts":{"name":"scripts","dependencies":"copy"},"serve":{"name":"serve","dependencies":"scripts"},"default":{"name":"default","dependencies":"serve"}}}}
