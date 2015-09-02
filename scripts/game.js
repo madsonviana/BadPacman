@@ -5,6 +5,10 @@ var pacman;
 var monsters;
 var score = 0;
 var scoreText;
+var fail = 0;
+var failText;
+var leftKey;
+var rightKey;
 
 var startButton;
 var gameStarted = false;
@@ -14,6 +18,8 @@ var nextFire = 0;
 
 var monsterRate = 1000;
 var nextMonster = 0;
+
+var moveSpeed = 3;
 
 function preload() {
 
@@ -31,8 +37,12 @@ function create() {
     game.physics.arcade.gravity.y = 100;
 
     // SCORE
-    scoreText = game.add.text(game.world.centerX, 10, "Score: "+ score, {font: "16px Arial", fill: "#ffffff"});
-    scoreText.anchor.set(0.5);
+    scoreText = game.add.text(10, 10, "Score: "+ score, {font: "16px Arial", fill: "green"});
+    scoreText.anchor.set(0);
+
+    // FAIL
+    failText = game.add.text(10, 30, "Fail: "+ fail, {font: "16px Arial", fill: "red"});
+    failText.anchor.set(0);
 
     // BUTTON
     startButtonAnimation = game.add.sprite(game.world.centerX, game.world.centerY, 'start_button_animation');
@@ -50,6 +60,7 @@ function create() {
     monsters.createMultiple(50, 'ghost_red');
     monsters.setAll('checkWorldBounds', true);
     monsters.setAll('outOfBoundsKill', true);
+    monsters.callAll('events.onOutOfBounds.add', 'events.onOutOfBounds', monsterOut );
     monsters.callAll('animations.add', 'animations', 'look', [0,1,6,7,2,3,4,5], 5, true);
     monsters.callAll('animations.play', 'animations', 'look');
 
@@ -64,10 +75,15 @@ function create() {
     fruits.setAll('body.allowGravity', false);
 
     // PACMAN
-    pacman = game.add.sprite(game.world.centerX, 590, 'pacman');
+    pacman = game.add.sprite(game.world.centerX, 580, 'pacman');
     pacman.anchor.set(0.5);
     pacman.frame = 3;
     pacman.animations.add('eat', [2,3,4], 10, false);
+
+
+    // KEYS
+    leftKey = game.input.keyboard.addKey(Phaser.Keyboard.LEFT);
+    rightKey = game.input.keyboard.addKey(Phaser.Keyboard.RIGHT);
 
     game.physics.arcade.enable([pacman, monsters]);
 
@@ -79,11 +95,18 @@ function update() {
 
     pacman.rotation = game.physics.arcade.angleToPointer(pacman);
     scoreText.text = 'Score: '+ score;
+    failText.text = 'Fail: '+ fail;
 
     if( gameStarted ) {
         if(game.input.activePointer.isDown) {
             fire();
             pacman.animations.play('eat');
+        }
+
+        if(leftKey.isDown && pacman.x > 10) {
+            pacman.x = pacman.x - moveSpeed;
+        } else if(rightKey.isDown && pacman.x < 590) {
+            pacman.x = pacman.x + moveSpeed;
         }
 
         spawmMonster();
@@ -117,6 +140,11 @@ function explode(fruit, monster) {
     fruit.kill();
     monster.kill();
     score++;
+}
+
+function monsterOut(monster) {
+    monster.kill();
+    fail++;    
 }
 
 function startButtonClicked() {
