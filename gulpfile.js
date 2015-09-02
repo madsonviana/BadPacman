@@ -5,6 +5,7 @@ var concat = require('gulp-concat');
 var uglify = require('gulp-uglify');
 var del = require('del');
 var browserSync = require('browser-sync');
+var ghPages = require('gulp-gh-pages');
 
 var PUBLIC_FOLDER = 'public/';
 var SCRIPT_DEST_FOLDER = PUBLIC_FOLDER+'js/'
@@ -37,6 +38,12 @@ gulp.task('serve', ['scripts'], function() {
 
     gulp.watch('scripts/**/*.js', ['scripts']);
     gulp.watch(['*.html', 'js/**/*js']).on('change', browserSync.reload);
+});
+
+ 
+gulp.task('deploy', function() {
+  return gulp.src('./'+PUBLIC_FOLDER+'**/*')
+    .pipe(ghPages());
 });
 
 gulp.task('default', ['serve']);
